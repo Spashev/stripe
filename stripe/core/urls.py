@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('payment.urls'))
+    path('', include(('payment.urls', 'payment'), namespace='payment'))
 ]
 
 if settings.DEBUG:
