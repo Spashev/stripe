@@ -26,7 +26,7 @@ class Item(models.Model):
     name = models.CharField(max_length=150, verbose_name='Item name', help_text='Item name length 150')
     description = models.CharField(max_length=500, verbose_name='Item description')
     price = models.DecimalField(verbose_name='Item price', max_digits=12, decimal_places=2, default=0)
-    image = models.ImageField(verbose_name='Item image', upload_to='uploads/%Y/%m/%d/', null=True, blank=True)
+    image = models.ImageField(verbose_name='Item image', upload_to='uploads/%Y/%m/%d/', blank=True, null=True)
     slug = models.SlugField(verbose_name='Item slug', null=True, blank=True)
 
     class Meta:
@@ -43,8 +43,6 @@ class Item(models.Model):
         return reverse('payment:item-detail', kwargs={'slug': self.slug})
 
     def save(self, commit=True, *args, **kwargs):
-        if commit:
-            image_resize(self.image, 350, 350)
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
