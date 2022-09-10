@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.views.generic import TemplateView, DetailView
 
@@ -8,7 +8,6 @@ from rest_framework import status
 
 from .models import Item
 
-import json
 import stripe
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -30,32 +29,43 @@ class ItemDetailView(DetailView):
     slug_field = 'slug'
     context_object_name = 'item'
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context.update({
+            'public_key': settings.STRIPE_PUBLIC_KEY
+        })
+        print(context)
+        return context
+
 
 class StripeSessionsView(APIView):
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         try:
-            data = json.loads(request.data)
-            checkout_session = stripe.checkout.Session.create(
-                line_items=[
-                    {
-                        'price': '{{PRICE_ID}}',
-                        'price_data': {
-                            'currency': 'kzt',
-                            'unit_amount': 2000,
-                            'product_data': {
-                                'name': 'Test name',
-                            }
+            item_id = kwargs.get('id', None)
+            if item_id is not None:
+                item = get_object_or_404(Item, id=item_id)
+                print(item)
+                checkout_session = stripe.checkout.Session.create(
+                    line_items=[
+                        {
+                            'price_data': {
+                                'currency': 'kzt',
+                                'unit_amount': int(item.price),
+                                'product_data': {
+                                    'name': item.name,
+                                }
+                            },
+                            'quantity': 1,
                         },
-                        'quantity': 1,
-                    },
-                ],
-                mode='payment',
-                success_url=DOMAIN + '/success/',
-                cancel_url=DOMAIN + '/cancel/',
-            )
-            return Response({'message': checkout_session.url}, status.HTTP_303_SEE_OTHER)
+                    ],
+                    mode='payment',
+                    success_url=DOMAIN + '/success/',
+                    cancel_url=DOMAIN + '/cancel/',
+                )
+                return Response({'message': checkout_session.url}, status.HTTP_201_CREATED)
+            return Response({'error': 'Not enough data'}, status.HTTP_403_FORBIDDEN)
         except Exception as e:
-            return Response({'error': str(e)}, status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status.HTTP_403_FORBIDDEN)
 
     @classmethod
     def calculate_order_amount(cls, items):
@@ -63,3 +73,11 @@ class StripeSessionsView(APIView):
         # Calculate the order total on the server to prevent
         # people from directly manipulating the amount on the client
         return 1400
+
+
+class SuccessView(TemplateView):
+    template_name = 'payment/success.html'
+
+
+class ErrorView(TemplateView):
+    template_name = 'payment/error.html'

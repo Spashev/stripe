@@ -3,8 +3,6 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
 
-from .utils import image_resize
-
 
 class UserModel(models.Model):
     """
