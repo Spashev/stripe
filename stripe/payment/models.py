@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from .utils import image_resize
+
 
 class UserModel(models.Model):
     """
@@ -23,6 +25,7 @@ class Item(models.Model):
     name = models.CharField(max_length=150, verbose_name='Item name', help_text='Item name length 150')
     description = models.CharField(max_length=500, verbose_name='Item description')
     price = models.FloatField(verbose_name='Item price')
+    image = models.ImageField(verbose_name='Item image', upload_to='uploads/%Y/%m/%d/', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Item'
@@ -33,6 +36,12 @@ class Item(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, commit=True, *args, **kwargs):
+
+        if commit:
+            image_resize(self.image, 250, 250)
+            super().save(*args, **kwargs)
 
 
 class Order(models.Model):
