@@ -40,7 +40,7 @@ class Item(models.Model):
     def save(self, commit=True, *args, **kwargs):
 
         if commit:
-            image_resize(self.image, 250, 250)
+            image_resize(self.image, 350, 350)
             super().save(*args, **kwargs)
 
 
