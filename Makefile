@@ -43,3 +43,7 @@ destroy: ## Stop and remove all containers, networks, images, and volumes
 migrate: ## Start all migrations
 	${STRIPE} python manage.py migrate
 	@echo ">>> Migrations done!"
+
+test: ## Run all tests
+	${STRIPE} python manage.py test
+	@echo ">>> Tests done!"
