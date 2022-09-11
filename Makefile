@@ -7,7 +7,7 @@ DOCKER_COMP = docker-compose
 DOCKER_EXEC = $(DOCKER_COMP) exec
 
 # Executables docker containers
-STRIPE = $(DOCKER_EXEC) stripe
+STRIPE = $(DOCKER_EXEC) web
 
 help: ## Help message
 	@echo "Please choose a task:"

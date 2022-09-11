@@ -40,6 +40,9 @@ class Item(models.Model):
     def get_absolute_url(self):
         return reverse('payment:item-detail', kwargs={'slug': self.slug})
 
+    def get_url_intent(self):
+        return reverse('payment:intent-item-detail', kwargs={'slug': self.slug})
+
     def save(self, commit=True, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)

@@ -17,7 +17,7 @@
                     <p class="card-text">{{ item.description }}</p>
                     <footer class="float-end"><small><i>{{ item.price }} <cite title="Source Title">kzt</cite></i></small></footer>
                   </div>
-                    <a href="{{ item.get_absolute_url }}" class="btn btn-primary m-2">More</a>
+                    <a href="{{ item.get_url_intent }}" class="btn btn-primary m-2">More</a>
                 </div>
             </div>
         {% endfor %}

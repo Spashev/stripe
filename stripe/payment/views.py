@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Item
+from .utils import calculate_order_amount
 
 import stripe
 
@@ -36,7 +37,7 @@ class IntentPageView(TemplateView):
         return context
 
 
-class ItemDetailView(DetailView):
+class SessionItemDetailView(DetailView):
     model = Item
     template_name = 'payment/session/detail.html'
     slug_field = 'slug'
@@ -47,7 +48,20 @@ class ItemDetailView(DetailView):
         context.update({
             'public_key': settings.STRIPE_PUBLIC_KEY
         })
-        print(context)
+        return context
+
+
+class IntentItemDetailView(DetailView):
+    model = Item
+    template_name = 'payment/intent/detail.html'
+    slug_field = 'slug'
+    context_object_name = 'item'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context.update({
+            'public_key': settings.STRIPE_PUBLIC_KEY
+        })
         return context
 
 
@@ -91,27 +105,19 @@ class StripeIntentView(APIView):
             if item_id is not None:
                 item = get_object_or_404(Item, id=item_id)
                 print(item)
-                checkout_session = stripe.checkout.Session.create(
-                    line_items=[
-                        {
-                            'price_data': {
-                                'currency': 'kzt',
-                                'unit_amount': int(item.price) * 100,
-                                'product_data': {
-                                    'name': item.name
-                                }
-                            },
-                            'quantity': 1,
-                        },
-                    ],
-                    mode='payment',
-                    success_url=DOMAIN + '/success/',
-                    cancel_url=DOMAIN + '/cancel/',
-                    metadata={
-                        item_id: item.id
-                    }
+                intent = stripe.PaymentIntent.create(
+                    amount=calculate_order_amount(item),
+                    currency='usd',
+                    description=item.description,
+                    automatic_payment_methods={
+                        'enabled': True,
+                    },
                 )
-                return Response({'message': checkout_session.url}, status.HTTP_201_CREATED)
+                print(intent)
+                client_secret = intent.get('client_secret', None)
+                if client_secret is None:
+                    return Response({'error': 'Not enough data'}, status.HTTP_403_FORBIDDEN)
+                return Response({'clientSecret': client_secret}, status.HTTP_201_CREATED)
             return Response({'error': 'Not enough data'}, status.HTTP_403_FORBIDDEN)
         except Exception as e:
             return Response({'error': str(e)}, status.HTTP_403_FORBIDDEN)

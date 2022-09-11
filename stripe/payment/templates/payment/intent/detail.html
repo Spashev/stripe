@@ -5,6 +5,18 @@
 {% endblock %}
 {% block content %}
         <div class="row m-5" id="app">
+            <div v-if="show_form">
+                <form id="payment-form">
+                  <div id="payment-element">
+                    <!--Stripe.js injects the Payment Element-->
+                  </div>
+                  <button id="submit">
+                    <div class="spinner hidden" id="spinner"></div>
+                    <span id="button-text">Pay now</span>
+                  </button>
+                  <div id="payment-message" class="hidden"></div>
+                </form>
+            </div>
             <div class="col-md-8 offset-md-2">
                 <div class="card">
                   {% if item.image %}
@@ -29,17 +41,20 @@
           delimiters: ["[[", "]]"],
           el: '#app',
           data: {
-            pk: '{{public_key}}'
+            pk: '{{public_key}}',
+            show_form: false,
+            client_secret: ''
           },
           methods: {
                buyItem(id) {
                 var stripe = Stripe(this.pk);
                 try {
-                    axios.get('http://127.0.0.1:8000/buy/' + id + '/session')
+                    axios.get('http://127.0.0.1:8000/buy/' + id + '/intent')
                      .then(function(response) {
                         if (response.data.message !== 'undefined') {
-                            session_id = response.data.message
-                            window.location.replace(session_id)
+                            this.client_secret = response.data.clientSecret
+                            this.show_form = true
+                            console.log(this.client_secret, this.show_form)
                         } else {
                             alert('Server error:' + response.data.message)
                         }

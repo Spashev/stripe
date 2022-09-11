@@ -14,9 +14,9 @@ services:
   # --------------------------------------
   # Application
   # --------------------------------------
-  stripe:
+  web:
     build: .
-    container_name: stripe
+    container_name: web
     restart: always
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
@@ -37,4 +37,4 @@ services:
     ports:
       - "81:81"
     depends_on:
-      - stripe
+      - web
