@@ -69,6 +69,7 @@ class StripeSessionView(APIView):
     def get(self, request, *args, **kwargs):
         try:
             item_id = kwargs.get('id', None)
+            quantity = request.GET.get('quantity', 1)
             if item_id is not None:
                 item = get_object_or_404(Item, id=item_id)
                 print(item)
@@ -77,12 +78,13 @@ class StripeSessionView(APIView):
                         {
                             'price_data': {
                                 'currency': 'kzt',
-                                'unit_amount': int(item.price) * 100,
+                                'unit_amount': calculate_order_amount(item * 100, quantity),
                                 'product_data': {
-                                    'name': item.name
+                                    'name': item.name,
+                                    'description': item.description,
                                 }
                             },
-                            'quantity': 1,
+                            'quantity': quantity,
                         },
                     ],
                     mode='payment',
@@ -104,16 +106,14 @@ class StripeIntentView(APIView):
             item_id = kwargs.get('id', None)
             if item_id is not None:
                 item = get_object_or_404(Item, id=item_id)
-                print(item)
                 intent = stripe.PaymentIntent.create(
-                    amount=calculate_order_amount(item),
+                    amount=calculate_order_amount(item, 1),
                     currency='usd',
                     description=item.description,
                     automatic_payment_methods={
                         'enabled': True,
                     },
                 )
-                print(intent)
                 client_secret = intent.get('client_secret', None)
                 if client_secret is None:
                     return Response({'error': 'Not enough data'}, status.HTTP_403_FORBIDDEN)

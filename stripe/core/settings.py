@@ -153,4 +153,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STRIPE_PUBLIC_KEY = os.getenv('PUBLIC_KEY', '')
 STRIPE_SECRET_KEY = os.getenv('SECRET_KEY', '')
-STRIPE_WEBHOOK_SECRET = ''
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
+}
