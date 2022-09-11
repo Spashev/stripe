@@ -35,7 +35,7 @@
                buyItem(id) {
                 var stripe = Stripe(this.pk);
                 try {
-                    axios.get('http://127.0.0.1:8000/buy/' + id)
+                    axios.get('http://127.0.0.1:8000/buy/' + id + '/session')
                      .then(function(response) {
                         if (response.data.message !== 'undefined') {
                             session_id = response.data.message

@@ -1,0 +1,54 @@
+{% extends "payment/wrapper.html" %}
+{% block head %}
+    <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+{% block content %}
+        <div class="row m-5" id="app">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                  {% if item.image %}
+                    <img src="{{ item.image.url }}" class="card-img-top img" alt="item image">
+                  {% else %}
+                    <img src="https://i.imgur.com/EHyR2nP.png" class="card-img-top img" alt="item image">
+                  {% endif %}
+                  <div class="card-body">
+                    <h5 class="card-title">{{ item.name }}</h5>
+                    <p class="card-text">{{ item.description }}</p>
+                    <footer class="float-end"><small><i>{{ item.price }}<cite title="Source Title">USD</cite></i></small></footer>
+                  </div>
+                    <a class="btn btn-warning m-2" @click="buyItem({{item.id}})">Buy</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script type="text/javascript">
+      var app = new Vue({
+          delimiters: ["[[", "]]"],
+          el: '#app',
+          data: {
+            pk: '{{public_key}}'
+          },
+          methods: {
+               buyItem(id) {
+                var stripe = Stripe(this.pk);
+                try {
+                    axios.get('http://127.0.0.1:8000/buy/' + id + '/session')
+                     .then(function(response) {
+                        if (response.data.message !== 'undefined') {
+                            session_id = response.data.message
+                            window.location.replace(session_id)
+                        } else {
+                            alert('Server error:' + response.data.message)
+                        }
+                     })
+                 } catch (err) {
+                    alert(err.response.data);
+                 }
+               }
+          }
+      })
+    </script>
+{%endblock %}

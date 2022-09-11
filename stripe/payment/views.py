@@ -19,7 +19,7 @@ class HomePageView(TemplateView):
 
 
 class SessionPageView(TemplateView):
-    template_name = 'payment/session.html'
+    template_name = 'payment/session/session.html'
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -28,7 +28,7 @@ class SessionPageView(TemplateView):
 
 
 class IntentPageView(TemplateView):
-    template_name = 'payment/intent.html'
+    template_name = 'payment/intent/intent.html'
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -38,7 +38,7 @@ class IntentPageView(TemplateView):
 
 class ItemDetailView(DetailView):
     model = Item
-    template_name = 'payment/detail.html'
+    template_name = 'payment/session/detail.html'
     slug_field = 'slug'
     context_object_name = 'item'
 
@@ -51,7 +51,40 @@ class ItemDetailView(DetailView):
         return context
 
 
-class StripeSessionsView(APIView):
+class StripeSessionView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            item_id = kwargs.get('id', None)
+            if item_id is not None:
+                item = get_object_or_404(Item, id=item_id)
+                print(item)
+                checkout_session = stripe.checkout.Session.create(
+                    line_items=[
+                        {
+                            'price_data': {
+                                'currency': 'kzt',
+                                'unit_amount': int(item.price) * 100,
+                                'product_data': {
+                                    'name': item.name
+                                }
+                            },
+                            'quantity': 1,
+                        },
+                    ],
+                    mode='payment',
+                    success_url=DOMAIN + '/success/',
+                    cancel_url=DOMAIN + '/cancel/',
+                    metadata={
+                        item_id: item.id
+                    }
+                )
+                return Response({'message': checkout_session.url}, status.HTTP_201_CREATED)
+            return Response({'error': 'Not enough data'}, status.HTTP_403_FORBIDDEN)
+        except Exception as e:
+            return Response({'error': str(e)}, status.HTTP_403_FORBIDDEN)
+
+
+class StripeIntentView(APIView):
     def get(self, request, *args, **kwargs):
         try:
             item_id = kwargs.get('id', None)
