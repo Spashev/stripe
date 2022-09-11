@@ -1,0 +1,7 @@
+.idea/
+.git/
+.github/
+docs/
+venv/
+env/
+docker-compose.yml
