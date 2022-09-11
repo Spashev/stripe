@@ -5,7 +5,8 @@ from .views import (
     StripeSessionsView,
     ItemDetailView,
     SuccessView,
-    ErrorView
+    ErrorView,
+    CancelView
 )
 
 urlpatterns = [
@@ -13,5 +14,6 @@ urlpatterns = [
     path('item/<slug:slug>', ItemDetailView.as_view(), name='item-detail'),
     path('buy/<int:id>', StripeSessionsView.as_view(), name='stripe-sessions'),
     path('success/', SuccessView.as_view(), name='success'),
-    path('error/', ErrorView.as_view(), name='error')
+    path('error/', ErrorView.as_view(), name='error'),
+    path('cancel/', CancelView.as_view(), name='cancel'),
 ]

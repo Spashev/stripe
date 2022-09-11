@@ -50,9 +50,9 @@ class StripeSessionsView(APIView):
                         {
                             'price_data': {
                                 'currency': 'kzt',
-                                'unit_amount': int(item.price),
+                                'unit_amount': int(item.price) * 100,
                                 'product_data': {
-                                    'name': item.name,
+                                    'name': item.name
                                 }
                             },
                             'quantity': 1,
@@ -61,18 +61,14 @@ class StripeSessionsView(APIView):
                     mode='payment',
                     success_url=DOMAIN + '/success/',
                     cancel_url=DOMAIN + '/cancel/',
+                    metadata={
+                        item_id: item.id
+                    }
                 )
                 return Response({'message': checkout_session.url}, status.HTTP_201_CREATED)
             return Response({'error': 'Not enough data'}, status.HTTP_403_FORBIDDEN)
         except Exception as e:
             return Response({'error': str(e)}, status.HTTP_403_FORBIDDEN)
-
-    @classmethod
-    def calculate_order_amount(cls, items):
-        # Replace this constant with a calculation of the order's amount
-        # Calculate the order total on the server to prevent
-        # people from directly manipulating the amount on the client
-        return 1400
 
 
 class SuccessView(TemplateView):
@@ -81,3 +77,7 @@ class SuccessView(TemplateView):
 
 class ErrorView(TemplateView):
     template_name = 'payment/error.html'
+
+
+class CancelView(TemplateView):
+    template_name = 'payment/cancel.html'

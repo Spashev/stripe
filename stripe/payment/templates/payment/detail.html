@@ -32,19 +32,22 @@
             pk: '{{public_key}}'
           },
           methods: {
-           buyItem(id) {
-            var stripe = Stripe(this.pk);
-            axios.get('http://127.0.0.1:8000/buy/' + id)
-             .then(function(response) {
-                console.log(response.data)
-                if (response.data.message !== 'undefined') {
-                    session_id = response.data.message
-                    window.location.replace(session_id)
-                } else {
-                    alert(response.data)
-                }
-              })
-           }
+               buyItem(id) {
+                var stripe = Stripe(this.pk);
+                try {
+                    axios.get('http://127.0.0.1:8000/buy/' + id)
+                     .then(function(response) {
+                        if (response.data.message !== 'undefined') {
+                            session_id = response.data.message
+                            window.location.replace(session_id)
+                        } else {
+                            alert('Server error:' + response.data.message)
+                        }
+                     })
+                 } catch (err) {
+                    alert(err.response.data);
+                 }
+               }
           }
       })
     </script>
