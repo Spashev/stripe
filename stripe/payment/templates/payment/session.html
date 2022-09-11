@@ -1,24 +1,26 @@
 {% extends "payment/wrapper.html" %}
 {% block content %}
-        <div class="row">
-            {% for item in items %}
-                <div class="col-md-4">
-                    <div class="card">
-                      {% if item.image %}
-                        <img src="{{ item.image.url }}" class="card-img-top img" alt="item image">
-                      {% else %}
-                        <img src="https://rozetked.me/images/uploads/NAV5EnbFSuOM.jpg" class="card-img-top img" alt="item image">
-                      {% endif %}
-                      <div class="card-body">
-                        <h5 class="card-title">{{ item.name }}</h5>
-                        <p class="card-text">{{ item.description }}</p>
-                        <footer class="float-end"><small><i>{{ item.price }} <cite title="Source Title">kzt</cite></i></small></footer>
-                      </div>
-                        <a href="{{ item.get_absolute_url }}" class="btn btn-primary m-2">More</a>
-                    </div>
+    <div class="col-lg-6 col-md-8 mx-auto">
+        <h1 class="fw-light">Payment Session</h1>
+    </div>
+    <div class="row">
+        {% for item in items %}
+            <div class="col-md-4">
+                <div class="card">
+                  {% if item.image %}
+                    <img src="{{ item.image.url }}" class="card-img-top img" alt="item image">
+                  {% else %}
+                    <img src="https://rozetked.me/images/uploads/NAV5EnbFSuOM.jpg" class="card-img-top img" alt="item image">
+                  {% endif %}
+                  <div class="card-body">
+                    <h5 class="card-title">{{ item.name }}</h5>
+                    <p class="card-text">{{ item.description }}</p>
+                    <footer class="float-end"><small><i>{{ item.price }} <cite title="Source Title">kzt</cite></i></small></footer>
+                  </div>
+                    <a href="{{ item.get_absolute_url }}" class="btn btn-primary m-2">More</a>
                 </div>
-            {% endfor %}
-        </div>
+            </div>
+        {% endfor %}
     </div>
 {% endblock %}
 {% block script %}
