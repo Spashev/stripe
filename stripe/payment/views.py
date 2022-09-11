@@ -70,6 +70,7 @@ class StripeSessionView(APIView):
         try:
             item_id = kwargs.get('id', None)
             quantity = request.GET.get('quantity', 1)
+            print(quantity)
             if item_id is not None:
                 item = get_object_or_404(Item, id=item_id)
                 print(item)
@@ -78,7 +79,7 @@ class StripeSessionView(APIView):
                         {
                             'price_data': {
                                 'currency': 'kzt',
-                                'unit_amount': calculate_order_amount(item * 100, quantity),
+                                'unit_amount': calculate_order_amount(item),
                                 'product_data': {
                                     'name': item.name,
                                     'description': item.description,
@@ -107,7 +108,7 @@ class StripeIntentView(APIView):
             if item_id is not None:
                 item = get_object_or_404(Item, id=item_id)
                 intent = stripe.PaymentIntent.create(
-                    amount=calculate_order_amount(item, 1),
+                    amount=calculate_order_amount(item),
                     currency='usd',
                     description=item.description,
                     automatic_payment_methods={

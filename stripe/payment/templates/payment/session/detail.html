@@ -16,6 +16,7 @@
                     <h5 class="card-title">{{ item.name }}</h5>
                     <p class="card-text">{{ item.description }}</p>
                     <footer class="float-end"><small><i>{{ item.price }}<cite title="Source Title">USD</cite></i></small></footer>
+                      <input class="form-control" type="number" name="quantity" v-model="quantity" placeholder="quantity">
                   </div>
                     <a class="btn btn-warning m-2" @click="buyItem({{item.id}})">Buy</a>
                 </div>
@@ -29,13 +30,14 @@
           delimiters: ["[[", "]]"],
           el: '#app',
           data: {
-            pk: '{{public_key}}'
+            pk: '{{public_key}}',
+            quantity: 1,
           },
           methods: {
                buyItem(id) {
                 var stripe = Stripe(this.pk);
                 try {
-                    axios.get('http://127.0.0.1:8000/buy/' + id + '/session')
+                    axios.get('http://127.0.0.1:8000/buy/' + id + '/session?quantity=' + this.quantity)
                      .then(function(response) {
                         if (response.data.message !== 'undefined') {
                             session_id = response.data.message
