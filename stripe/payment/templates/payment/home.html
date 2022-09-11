@@ -1,0 +1,13 @@
+{% extends "payment/wrapper.html" %}
+{% block content %}
+    <div class="row py-lg-5">
+      <div class="col-lg-6 col-md-8 mx-auto">
+        <h1 class="fw-light">Stripe Payment</h1>
+        <p class="lead text-muted">Payment with creating session and payment intent</p>
+        <p>
+          <a href="{% url 'payment:session' %}" class="btn btn-primary my-2">Payment session</a>
+          <a href="{% url 'payment:intent' %}" class="btn btn-secondary my-2">Payment intent</a>
+        </p>
+      </div>
+    </div>
+{% endblock %}

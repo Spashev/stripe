@@ -15,7 +15,20 @@ DOMAIN = 'http://127.0.0.1:8000'
 
 
 class HomePageView(TemplateView):
-    template_name = 'payment/index.html'
+    template_name = 'payment/home.html'
+
+
+class SessionPageView(TemplateView):
+    template_name = 'payment/session.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['items'] = Item.objects.all()
+        return context
+
+
+class IntentPageView(TemplateView):
+    template_name = 'payment/intent.html'
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
