@@ -2,6 +2,11 @@
 
 ## Развертывание тестового проекта
 
+### ENV
+<pre>
+cp .env.xample .env
+</pre>
+
 ### 1) Makefile Deployment
 <pre>make install</pre>
 
